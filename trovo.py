@@ -3,6 +3,7 @@ from shutil import which
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from basic import random_string
+from selenium.webdriver.support.ui import Select
 
 
 c_p = which('chromedriver.exe')
@@ -44,5 +45,25 @@ inputs[1].send_keys(user_name)
 # sending random password
 password = random_string(8)
 inputs[2].send_keys(password)
+# entering date of birth
+month = driver.find_element_by_xpath('//div[@class="month"]')
+month.click()
+feb = driver.find_element_by_xpath('(//ul[@class="dropdown-list"])[1]/li[2]')
+feb.click()
 
+day = driver.find_element_by_xpath('//div[@class="day"]')
+day.click()
+two = driver.find_element_by_xpath('(//ul[@class="dropdown-list"])[2]/li[2]')
+two.click()
+
+year = driver.find_element_by_xpath('//div[@class="year"]')
+year.click()
+twoKone = driver.find_element_by_xpath('(//ul[@class="dropdown-list"])[3]/li[20]')
+twoKone.click()
+# final sign up button clicked
+signup_btn_big = driver.find_element_by_xpath('//button[@class="button-sign-up primary-btn"]')
+signup_btn_big.click()
+# wait for captcha....
+
+# 
 driver.implicitly_wait(60)
