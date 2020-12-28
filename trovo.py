@@ -11,7 +11,11 @@ import time
 
 chrome_path = which('chromedriver.exe')
 chrome_options = Options()
-chrome_options.add_argument("start-maximized")
+# chrome_options.add_argument('--headless')
+chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36 OPR/43.0.2442.991")
+# chrome_options.add_argument("start-maximized")
+chrome_options.ensure_clean_session = True
+chrome_options.add_argument("--window-size=800,600")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 chrome_options.add_experimental_option('useAutomationExtension', False)
 
@@ -41,11 +45,14 @@ while check:
 
 
 # opening temp mail
+time.sleep(1)
 driver.execute_script("window.open('about:blank', 'tab2');")
 # switching to tab 2/temp mail
+time.sleep(1)
 driver.switch_to.window("tab2")
+time.sleep(2)
 driver.get("https://emailfake.com/")
-
+time.sleep(3)
 email = driver.find_element_by_xpath('//span[@id="email_ch_text"]')
 email = email.text
 
@@ -78,16 +85,14 @@ day.click()
 two = driver.find_element_by_xpath('(//ul[@class="dropdown-list"])[2]/li[3]')
 two.click()
 
-time.sleep(5)
-year = driver.find_element_by_xpath('//div[@class="year"]')
-year.click()
 
-time.sleep(5)
-twoKone = driver.find_element_by_xpath('(//ul[@class="dropdown-list"])[3]/li[20]')
+year = driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/div/div[4]/div[1]/div[3]/div[1]/input')
+year.click()
+twoKone = wait.until(EC.element_to_be_clickable((By.XPATH,'/html/body/div[3]/div[2]/div[3]/div/div[4]/div[1]/div[3]/div[2]/ul/li[25]')))
 twoKone.click()
 
 # final sign up button clicked
-time.sleep(5)
+time.sleep(1)
 signup_btn_big = driver.find_element_by_xpath('//button[@class="button-sign-up primary-btn"]')
 signup_btn_big.click()
 
@@ -96,8 +101,7 @@ k = True
 while k:
     try:
         captcha_frame = driver.find_element(By.CSS_SELECTOR,"iframe[name^='a-'][src^='https://www.google.com/recaptcha/api2/anchor?']")        
-        driver.switch_to.frame(captcha_frame)  
-        driver.implicitly_wait(2)
+        driver.switch_to.frame(captcha_frame)        
         print('Frame changed')
         print('finding element')
         print('pray')        
@@ -110,8 +114,15 @@ while k:
         print('i am stll in')
 
 # verification....
-print('No i am out')
+try:
+    time.sleep(3)
+    e_t_t = driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/div/p')
+    print('captcha passed')
+    print(e_t_t.text)
+except:
+    print('still stuck in captcha')
 
 
 
 driver.implicitly_wait(60)
+# driver.quit()
