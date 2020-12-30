@@ -3,19 +3,20 @@ from selenium.webdriver.support.ui import WebDriverWait
 from shutil import which
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-from basic import random_string
+from basic import random_string,user_name
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import random
 
 
 chrome_path = which('chromedriver.exe')
 chrome_options = Options()
 # chrome_options.add_argument('--headless')
 chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36 OPR/43.0.2442.991")
-# chrome_options.add_argument("start-maximized")
+chrome_options.add_argument("start-maximized")
 chrome_options.ensure_clean_session = True
-chrome_options.add_argument("--window-size=800,600")
+# chrome_options.add_argument("--window-size=800,600")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 chrome_options.add_experimental_option('useAutomationExtension', False)
 
@@ -67,8 +68,9 @@ inputs = driver.find_elements_by_xpath('//div[@class="input-box border-bottom"]/
 # sending email
 inputs[0].send_keys(email)
 # sending random username
-user_name = random_string(7)
+user_name = user_name()
 inputs[1].send_keys(user_name)
+print(user_name)
 # sending random password
 password = random_string(8)
 inputs[2].send_keys(password)
@@ -76,19 +78,22 @@ inputs[2].send_keys(password)
 month = driver.find_element_by_xpath('//div[@class="month"]')
 time.sleep(2)
 month.click()
-feb = driver.find_element_by_xpath('(//ul[@class="dropdown-list"])[1]/li[2]')
+month_path = '(//ul[@class="dropdown-list"])[1]/li[' + str(random.choice(range(1,13))) + ']'
+month_ = driver.find_element_by_xpath(month_path)
 time.sleep(2)
-feb.click()
+month_.click()
 
 day = driver.find_element_by_xpath('//div[@class="day"]')
 day.click()
-two = driver.find_element_by_xpath('(//ul[@class="dropdown-list"])[2]/li[3]')
+day_path = '(//ul[@class="dropdown-list"])[2]/li[' + str(random.choice(range(1,20))) + ']'
+two = driver.find_element_by_xpath(day_path)
 two.click()
 
 
 year = driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/div/div[4]/div[1]/div[3]/div[1]/input')
 year.click()
-twoKone = wait.until(EC.element_to_be_clickable((By.XPATH,'/html/body/div[3]/div[2]/div[3]/div/div[4]/div[1]/div[3]/div[2]/ul/li[25]')))
+year_path = '/html/body/div[3]/div[2]/div[3]/div/div[4]/div[1]/div[3]/div[2]/ul/li[' + str(random.choice(range(25,30))) + ']'
+twoKone = wait.until(EC.element_to_be_clickable((By.XPATH,year_path)))
 twoKone.click()
 
 # final sign up button clicked
