@@ -8,17 +8,22 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
+import requests
 
 
 chrome_path = which('chromedriver.exe')
 chrome_options = Options()
 # chrome_options.add_argument('--headless')
+chrome_options.add_argument("--disable-notifications")
 chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36 OPR/43.0.2442.991")
 chrome_options.add_argument("start-maximized")
 chrome_options.ensure_clean_session = True
 # chrome_options.add_argument("--window-size=800,600")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 chrome_options.add_experimental_option('useAutomationExtension', False)
+
+
+
 
 driver = webdriver.Chrome(executable_path = chrome_path,options=chrome_options)
 
@@ -100,32 +105,75 @@ twoKone.click()
 time.sleep(1)
 signup_btn_big = driver.find_element_by_xpath('//button[@class="button-sign-up primary-btn"]')
 signup_btn_big.click()
+# 
+# Solving Captcha
+# 
+# 2captcha section
+pageurl = 'https://trovo.live/'
+site_key='6LfjEMoUAAAAAPv60USWs4LxOlTmoiGf7m2skV4O'
+with open(r"api_key.txt", "r") as f:
+  api_key = f.read()
+
+form = {"method": "userrecaptcha",
+        "googlekey": site_key,
+        "key": api_key, 
+        "pageurl": pageurl, 
+        "json": 1}
+
+response = requests.post('http://2captcha.com/in.php', data=form)
+request_id = response.json()['request']
+
+# 2 captcha section ended  
 
 # wait for captcha....
 k = True
-while k:
-    try:
-        captcha_frame = driver.find_element(By.CSS_SELECTOR,"iframe[name^='a-'][src^='https://www.google.com/recaptcha/api2/anchor?']")        
-        driver.switch_to.frame(captcha_frame)        
-        print('Frame changed')
-        print('finding element')
-        print('pray')        
-        btn = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="rc-anchor-container"]')))
-        btn.click()
-        print('button clicked')
-        k= False
-    except:
-        k=True
-        print('i am stll in')
+p=0
+
+    
+captcha_frame = driver.find_element(By.CSS_SELECTOR,"iframe[name^='a-'][src^='https://www.google.com/recaptcha/api2/anchor?']")        
+driver.switch_to.frame(captcha_frame)
+print('frame changed !!!')
+# 
+# 2captcha section
+url = f"http://2captcha.com/res.php?key={api_key}&action=get&id={request_id}&json=1"
+status = 0
+while not status:
+    res = requests.get(url)
+    if res.json()['status']==0:
+        print('status=0')
+        time.sleep(3)
+    else:
+        requ = res.json()['request']
+        print('putting captcha value')
+        wait = WebDriverWait(driver,60)
+        text_element = wait.until(EC.presence_of_element_located((By.XPATH,'//*[@id="g-recaptcha-response"]')))    
+        print(text_element)  
+        print(requ)
+        print('element found')  
+        js = f'document.getElementById("g-recaptcha-response").innerHTML="{requ}";'
+        ks = f'___grecaptcha_cfg.clients[0].V.V.callback();'
+        print(js)
+        driver.execute_script(js)
+        driver.execute_script(ks)
+        # driver.find_element_by_xpath('//*[@id="g-recaptcha-response"]').send_keys(Keys.ENTER)
+        status = 1
+        print('status =1')
+        print('awesome')
+        print('Now i am going for leave')
+        print('last script')
+        print('good night')
+        print('captcha passed')
 
 # verification....
-try:
-    time.sleep(3)
-    e_t_t = driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/div/p')
-    print('captcha passed')
-    print(e_t_t.text)
-except:
-    print('still stuck in captcha')
+# try:
+#     time.sleep(3)
+#     e_t_t = driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/div/p')
+#     print('captcha passed')
+#     print(e_t_t.text)
+#     submit_again = driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/div/div/button')
+#     submit_again.click()
+# except:
+#     print('still stuck in captcha')
 
 
 
