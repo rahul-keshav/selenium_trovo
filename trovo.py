@@ -84,22 +84,21 @@ month = driver.find_element_by_xpath('//div[@class="month"]')
 time.sleep(2)
 month.click()
 month_path = '(//ul[@class="dropdown-list"])[1]/li[' + str(random.choice(range(1,13))) + ']'
-month_ = driver.find_element_by_xpath(month_path)
-time.sleep(2)
-month_.click()
+month_submit = driver.find_element_by_xpath(month_path)
+month_submit.click()
 
 day = driver.find_element_by_xpath('//div[@class="day"]')
 day.click()
 day_path = '(//ul[@class="dropdown-list"])[2]/li[' + str(random.choice(range(1,20))) + ']'
-two = driver.find_element_by_xpath(day_path)
-two.click()
+day_submit = driver.find_element_by_xpath(day_path)
+day_submit.click()
 
 
 year = driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/div/div[4]/div[1]/div[3]/div[1]/input')
 year.click()
 year_path = '/html/body/div[3]/div[2]/div[3]/div/div[4]/div[1]/div[3]/div[2]/ul/li[' + str(random.choice(range(25,30))) + ']'
-twoKone = wait.until(EC.element_to_be_clickable((By.XPATH,year_path)))
-twoKone.click()
+year_submit = wait.until(EC.element_to_be_clickable((By.XPATH,year_path)))
+year_submit.click()
 
 # final sign up button clicked
 time.sleep(1)
@@ -146,35 +145,45 @@ while not status:
         requ = res.json()['request']
         print('putting captcha value')
         wait = WebDriverWait(driver,60)
-        text_element = wait.until(EC.presence_of_element_located((By.XPATH,'//*[@id="g-recaptcha-response"]')))    
-        print(text_element)  
-        print(requ)
-        print('element found')  
+        text_element = wait.until(EC.presence_of_element_located((By.XPATH,'//*[@id="g-recaptcha-response"]')))      
         js = f'document.getElementById("g-recaptcha-response").innerHTML="{requ}";'
-        ks = f'___grecaptcha_cfg.clients[0].V.V.callback();'
-        print(js)
+        ks = f'___grecaptcha_cfg.clients[0].V.V.callback("{requ}");'
         driver.execute_script(js)
         driver.execute_script(ks)
-        # driver.find_element_by_xpath('//*[@id="g-recaptcha-response"]').send_keys(Keys.ENTER)
         status = 1
-        print('status =1')
-        print('awesome')
-        print('Now i am going for leave')
-        print('last script')
-        print('good night')
-        print('captcha passed')
+        driver.switch_to.default_content
+        
+time.sleep(10)
+#tab changed to get veification key 
+driver.switch_to.window(tabs[1])
+k=0
+while k==0:
+    try:
+        wait = WebDriverWait(driver,30)
+        verification_path='//*[@id="email-table"]/div[2]/div[4]/div[3]/table/tbody/tr/td/div/div[3]/div/div/div[3]/div/p/span/strong'
+        verification_key = wait.until(EC.presence_of_element_located((By.XPATH,verification_path))).text
+        print(verification_key)
+        k=1
+    except:
+        driver.refresh()
+        k=0
+        print('refreshing the browser')
+        print('email not recived')
+# back to tab 0 to put the verification Key
+verification_key_list = list(str(verification_key))
+print(verification_key_list)
+driver.switch_to.window(tabs[0])
+time.sleep(10)
+wait = WebDriverWait(driver,30)
+input_feild_1 = wait.until(EC.element_to_be_clickable((By.XPATH,'/html/body/div[3]/div[2]/div[3]/div/div/div[2]/div[1]/ul/li[1]')))
+time.sleep(2)
+input_feild_1.click()
+time.sleep(2)
+print(verification_key_list[0])
+input_feild_1.send_keys('7')
+time.sleep(10)
 
-# verification....
-# try:
-#     time.sleep(3)
-#     e_t_t = driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/div/p')
-#     print('captcha passed')
-#     print(e_t_t.text)
-#     submit_again = driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/div/div/button')
-#     submit_again.click()
-# except:
-#     print('still stuck in captcha')
-
+    
 
 
 driver.implicitly_wait(60)
