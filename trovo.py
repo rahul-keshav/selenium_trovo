@@ -9,13 +9,16 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
 import requests
+from selenium.webdriver.common.action_chains import ActionChains
+
 
 
 chrome_path = which('chromedriver.exe')
 chrome_options = Options()
 # chrome_options.add_argument('--headless')
+chrome_options.add_argument("--mute-audio")
 chrome_options.add_argument("--disable-notifications")
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36 OPR/43.0.2442.991")
+# chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36")
 chrome_options.add_argument("start-maximized")
 chrome_options.ensure_clean_session = True
 # chrome_options.add_argument("--window-size=800,600")
@@ -31,14 +34,12 @@ driver = webdriver.Chrome(executable_path = chrome_path,options=chrome_options)
 driver.get("https://trovo.live/",)
 wait = WebDriverWait(driver,20)
 log_in_btn = wait.until(EC.element_to_be_clickable((By.XPATH,"//button[@class='cat-button normal primary']")))
-# log_in_btn = driver.find_element_by_xpath("//button[@class='cat-button normal primary']")
 time.sleep(5)
 log_in_btn.click()
 check = True
 while check:
     try:
         signup_btn = wait.until(EC.element_to_be_clickable((By.XPATH,'//ul[@class="header-tab"]/li[2]'))) 
-        # signup_btn = driver.find_element_by_xpath('//ul[@class="header-tab"]/li[2]')
         time.sleep(5)
         signup_btn.click()
         check = False
@@ -78,6 +79,7 @@ inputs[1].send_keys(user_name)
 print(user_name)
 # sending random password
 password = random_string(8)
+time.sleep(1)
 inputs[2].send_keys(password)
 # entering date of birth
 month = driver.find_element_by_xpath('//div[@class="month"]')
@@ -85,12 +87,14 @@ time.sleep(2)
 month.click()
 month_path = '(//ul[@class="dropdown-list"])[1]/li[' + str(random.choice(range(1,13))) + ']'
 month_submit = driver.find_element_by_xpath(month_path)
+time.sleep(2)
 month_submit.click()
 
 day = driver.find_element_by_xpath('//div[@class="day"]')
 day.click()
 day_path = '(//ul[@class="dropdown-list"])[2]/li[' + str(random.choice(range(1,20))) + ']'
 day_submit = driver.find_element_by_xpath(day_path)
+time.sleep(2)
 day_submit.click()
 
 
@@ -98,6 +102,7 @@ year = driver.find_element_by_xpath('/html/body/div[3]/div[2]/div[3]/div/div[4]/
 year.click()
 year_path = '/html/body/div[3]/div[2]/div[3]/div/div[4]/div[1]/div[3]/div[2]/ul/li[' + str(random.choice(range(25,30))) + ']'
 year_submit = wait.until(EC.element_to_be_clickable((By.XPATH,year_path)))
+time.sleep(2)
 year_submit.click()
 
 # final sign up button clicked
@@ -122,18 +127,6 @@ form = {"method": "userrecaptcha",
 response = requests.post('http://2captcha.com/in.php', data=form)
 request_id = response.json()['request']
 
-# 2 captcha section ended  
-
-# wait for captcha....
-k = True
-p=0
-
-    
-captcha_frame = driver.find_element(By.CSS_SELECTOR,"iframe[name^='a-'][src^='https://www.google.com/recaptcha/api2/anchor?']")        
-driver.switch_to.frame(captcha_frame)
-print('frame changed !!!')
-# 
-# 2captcha section
 url = f"http://2captcha.com/res.php?key={api_key}&action=get&id={request_id}&json=1"
 status = 0
 while not status:
@@ -144,18 +137,16 @@ while not status:
     else:
         requ = res.json()['request']
         print('putting captcha value')
-        wait = WebDriverWait(driver,60)
-        text_element = wait.until(EC.presence_of_element_located((By.XPATH,'//*[@id="g-recaptcha-response"]')))      
-        js = f'document.getElementById("g-recaptcha-response").innerHTML="{requ}";'
         ks = f'___grecaptcha_cfg.clients[0].V.V.callback("{requ}");'
-        driver.execute_script(js)
         driver.execute_script(ks)
         status = 1
-        driver.switch_to.default_content
+        print('successfully executed captcha')
+        
         
 time.sleep(10)
 #tab changed to get veification key 
 driver.switch_to.window(tabs[1])
+driver.switch_to.default_content
 k=0
 while k==0:
     try:
@@ -175,16 +166,18 @@ print(verification_key_list)
 driver.switch_to.window(tabs[0])
 time.sleep(10)
 wait = WebDriverWait(driver,30)
-input_feild_1 = wait.until(EC.element_to_be_clickable((By.XPATH,'/html/body/div[3]/div[2]/div[3]/div/div/div[2]/div[1]/ul/li[1]')))
+input_feild_1 = wait.until(EC.presence_of_element_located((By.XPATH,'/html/body/div[3]/div[2]/div[3]/div/div/div[2]/div[1]/ul/li[1]')))
 time.sleep(2)
 input_feild_1.click()
-time.sleep(2)
-print(verification_key_list[0])
-input_feild_1.send_keys('7')
+print('clicked')
 time.sleep(10)
+actions = ActionChains(driver)
+actions.send_keys(verification_key)
+actions.perform()
 
-    
 
 
+print('text sent!!!')
+time.sleep(10) 
 driver.implicitly_wait(60)
 # driver.quit()
