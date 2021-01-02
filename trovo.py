@@ -1,9 +1,10 @@
 from selenium import webdriver
+import pandas as pd
 from selenium.webdriver.support.ui import WebDriverWait
 from shutil import which
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-from basic import random_string,user_name
+from basic import random_string,user_name,save_cred
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import time
@@ -15,7 +16,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 chrome_path = which('chromedriver.exe')
 chrome_options = Options()
-# chrome_options.add_argument('--headless')
+chrome_options.add_argument('--headless')
 chrome_options.add_argument("--mute-audio")
 chrome_options.add_argument("--disable-notifications")
 # chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36")
@@ -65,7 +66,6 @@ email = email.text
 
 # all tabs 
 tabs = driver.window_handles
-
 
 # switching back to tab 1
 driver.switch_to.window(tabs[0])
@@ -140,8 +140,7 @@ while not status:
         ks = f'___grecaptcha_cfg.clients[0].V.V.callback("{requ}");'
         driver.execute_script(ks)
         status = 1
-        print('successfully executed captcha')
-        
+        print('successfully executed captcha')        
         
 time.sleep(10)
 #tab changed to get veification key 
@@ -174,10 +173,10 @@ time.sleep(10)
 actions = ActionChains(driver)
 actions.send_keys(verification_key)
 actions.perform()
-
-
-
+driver.quit()
+save_cred(email,user_name,password)
 print('text sent!!!')
-time.sleep(10) 
-driver.implicitly_wait(60)
-# driver.quit()
+print(email)
+print(user_name)
+print(password)
+print('data saved in "username_password.csv" file')
