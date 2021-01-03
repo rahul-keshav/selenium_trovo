@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from shutil import which
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-from basic import random_string,user_name,save_cred
+from basic import random_string,user__name,save_cred
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import time
@@ -76,7 +76,7 @@ while(ke>0):
     # sending email
     inputs[0].send_keys(email)
     # sending random username
-    user_name = user_name()
+    user_name = user__name()
     inputs[1].send_keys(user_name)
     print(user_name)
     # sending random password
