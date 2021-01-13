@@ -175,6 +175,17 @@ while(ke>0):
     actions = ActionChains(driver)
     actions.send_keys(verification_key)
     actions.perform()
+    time.sleep(5)
+    m0=True
+    j0 = 4
+    while m0 and j0 >0:
+        try:
+            skip = WebDriverWait(driver,20).until(EC.element_to_be_clickable((By.XPATH,'//div[@class="skip cursor-pointer"]')))
+            skip.click()
+            m = False
+        except:
+            j0 = j0-1
+    time.sleep(10)
     driver.quit()
     save_cred(email,user_name,password)
     print('text sent!!!')
